@@ -1,0 +1,60 @@
+services:
+  # 1. MongoDB Database
+  mongodb:
+    image: mongo:7.0-jammy
+    container_name: reviewlens-mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: reviewlens
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - reviewlens-net
+
+  # 2. Node.js / Express Backend
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: reviewlens-backend
+    restart: always
+    ports:
+      - "5001:5001"
+    environment:
+      - PORT=5001
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongodb:27017/reviewlens
+      - AI_PROVIDER=${AI_PROVIDER:-kimi}
+      - KIMI_API_KEY=${KIMI_API_KEY}
+      - KIMI_MODEL=${KIMI_MODEL:-moonshot-v1-8k}
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - GROQ_MODEL=${GROQ_MODEL:-llama-3.3-70b-versatile}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+    depends_on:
+      - mongodb
+    networks:
+      - reviewlens-net
+
+  # 3. React Frontend (Nginx)
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: reviewlens-frontend
+    restart: always
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - reviewlens-net
+
+networks:
+  reviewlens-net:
+    driver: bridge
+
+volumes:
+  mongo-data:
+    driver: local
