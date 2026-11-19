@@ -162,8 +162,8 @@ export async function processReviewBatch(inspectedReviews) {
 
   // 5. Resolve in-batch duplicates (e.g. R015 inherits R012's analysis)
   for (const review of validCandidates) {
-    if (review.is_duplicate) {
-      cacheHitsCount++; // Duplicate counted as saved AI call!
+    if (review.is_duplicate && !cacheMap.has(review.text_hash)) {
+      cacheHitsCount++; // Duplicate counted as saved AI call
       const masterReview = intermediateResults.get(review.duplicate_of);
       if (masterReview) {
         intermediateResults.set(review.review_id, {
@@ -224,9 +224,9 @@ export async function processReviewBatch(inspectedReviews) {
       cacheHitsCount,
       durationMs,
       cacheHitRate:
-        inspectedReviews.length > 0
-          ? Math.round((cacheHitsCount / inspectedReviews.length) * 100)
-          : 0,
+        validCandidates.length > 0
+          ? Math.round((cacheHitsCount / validCandidates.length) * 100)
+          : 100,
     },
   };
 }
