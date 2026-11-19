@@ -1,0 +1,29 @@
+{
+  "name": "reviewlens",
+  "version": "1.0.0",
+  "description": "ReviewLens - AI-Powered Product Review Intelligence for Store Owners (CEDCOSS Assessment)",
+  "main": "server/index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
+    "server:dev": "npm --prefix server run dev",
+    "client:dev": "npm --prefix client run dev",
+    "install:all": "npm install && npm --prefix server install && npm --prefix client install",
+    "build": "npm --prefix client run build",
+    "start": "npm --prefix server start",
+    "test": "npm --prefix server test"
+  },
+  "keywords": [
+    "review-insights",
+    "mern",
+    "ai",
+    "kimi",
+    "groq",
+    "gemini",
+    "sentiment-analysis"
+  ],
+  "author": "Sunny Tyagi",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
