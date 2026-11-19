@@ -7,6 +7,12 @@ import { getConnectionStatus } from '../config/db.js';
 import Review from '../models/Review.js';
 import UploadBatch from '../models/UploadBatch.js';
 
+import {
+  detectRatingMismatches,
+  aggregateProductAnalytics,
+  calculateTelemetry,
+} from '../services/bonusService.js';
+
 // In-Memory store for reviews and batches when MongoDB is offline
 const memoryReviewStore = new Map();
 const memoryBatchStore = new Map();
@@ -367,6 +373,39 @@ export async function getProductInsights(req, res) {
     return res.status(200).json({
       success: true,
       products: result,
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+}
+
+/**
+ * GET /api/reviews/mismatches (Bonus Feature 1)
+ */
+export async function getMismatches(req, res) {
+  try {
+    const reviewsList = Array.from(memoryReviewStore.values());
+    const mismatchData = detectRatingMismatches(reviewsList);
+    return res.status(200).json({
+      success: true,
+      ...mismatchData,
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+}
+
+/**
+ * GET /api/reviews/telemetry (Bonus Feature 5)
+ */
+export async function getTelemetry(req, res) {
+  try {
+    const latestBatch = Array.from(memoryBatchStore.values()).pop();
+    const stats = latestBatch?.stats || {};
+    const telemetry = calculateTelemetry(stats);
+    return res.status(200).json({
+      success: true,
+      telemetry,
     });
   } catch (error) {
     return res.status(500).json({ error: error.message });

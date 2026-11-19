@@ -5,6 +5,8 @@ import {
   getReviews,
   getSummary,
   getProductInsights,
+  getMismatches,
+  getTelemetry,
   suggestReply,
 } from '../controllers/reviewController.js';
 
@@ -22,6 +24,8 @@ router.post('/upload', upload.single('file'), uploadReviews);
 router.get('/', getReviews);
 router.get('/summary', getSummary);
 router.get('/products', getProductInsights);
+router.get('/mismatches', getMismatches);
+router.get('/telemetry', getTelemetry);
 router.post('/:id/suggest-reply', suggestReply);
 
 export default router;
